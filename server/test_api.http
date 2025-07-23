@@ -1,0 +1,28 @@
+### Register a new Learner
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{
+  "email": "learner2@test.com",
+  "password": "password123123",
+  "role": "learner"
+}
+
+### Register a new Instructor
+POST http://localhost:5000/api/register
+Content-Type: application/json
+
+{
+  "email": "instructor1@test.com",
+  "password": "password456",
+  "role": "instructor"
+}
+
+### Login as a user
+POST http://localhost:5000/api/login
+Content-Type: application/json
+
+{
+  "email": "learner1@test.com",
+  "password": "password123"
+}
