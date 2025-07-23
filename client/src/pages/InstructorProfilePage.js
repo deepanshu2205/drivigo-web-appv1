@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import apiUrl from '../apiConfig'; // <-- Import the api URL
 
-// Define the schedule structure at the top for clarity
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const timeSlots = [
-  '07:00-08:00', '08:00-09:00', '09:00-10:00', 
-  '16:00-17:00', '17:00-18:00'
-];
+const timeSlots = ['07:00-08:00', '08:00-09:00', '09:00-10:00', '16:00-17:00', '17:00-18:00'];
 
 function InstructorProfilePage() {
-  // --- All State Management ---
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({ car_model: '', photo_url: '' });
   const [availability, setAvailability] = useState({});
 
-  // --- This useEffect fetches ALL data when the page loads ---
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -22,13 +17,11 @@ function InstructorProfilePage() {
         const token = localStorage.getItem('token');
         const headers = { 'Authorization': `Bearer ${token}` };
         const [profileRes, availabilityRes] = await Promise.all([
-          fetch('/api/instructor/profile', { headers }),
-          fetch('/api/instructor/availability', { headers })
+          fetch(`${apiUrl}/api/instructor/profile`, { headers }),
+          fetch(`${apiUrl}/api/instructor/availability`, { headers })
         ]);
 
-        if (!profileRes.ok || !availabilityRes.ok) {
-          throw new Error('Failed to fetch data.');
-        }
+        if (!profileRes.ok || !availabilityRes.ok) throw new Error('Failed to fetch data.');
 
         const profileData = await profileRes.json();
         const availabilityData = await availabilityRes.json();
@@ -36,7 +29,6 @@ function InstructorProfilePage() {
         setProfile(profileData);
         setFormData({ car_model: profileData.car_model || '', photo_url: profileData.photo_url || '' });
         
-        // Convert the fetched availability array into an object for easy state management
         const availabilityObj = {};
         availabilityData.forEach(item => {
           if (!availabilityObj[item.day_of_week]) {
@@ -55,7 +47,6 @@ function InstructorProfilePage() {
     fetchData();
   }, []);
 
-  // --- Handlers for the PROFILE form ---
   const handleProfileChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -64,7 +55,7 @@ function InstructorProfilePage() {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/instructor/profile', {
+      const response = await fetch(`${apiUrl}/api/instructor/profile`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify(formData)
@@ -76,14 +67,10 @@ function InstructorProfilePage() {
     }
   };
 
-  // --- Handlers for the AVAILABILITY checklist ---
   const handleAvailabilityChange = (day, slot) => {
     setAvailability(prev => {
       const newAvailability = { ...prev };
-      if (!newAvailability[day]) {
-        newAvailability[day] = new Set();
-      }
-      const daySlots = new Set(newAvailability[day]); // Create a new Set to avoid direct mutation
+      const daySlots = new Set(newAvailability[day]);
       if (daySlots.has(slot)) {
         daySlots.delete(slot);
       } else {
@@ -103,7 +90,7 @@ function InstructorProfilePage() {
     }
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/instructor/availability', {
+      const response = await fetch(`${apiUrl}/api/instructor/availability`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ availability: availabilityArray })
@@ -116,15 +103,14 @@ function InstructorProfilePage() {
   };
 
   if (loading) return <div>Loading...</div>;
+  if (!profile) return <div>Could not load profile.</div>;
 
-  // --- This is the main JSX that renders the entire page ---
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-3xl font-bold">My Instructor Profile</h2>
         <p className="text-lg text-gray-600"><strong>Email:</strong> {profile.email}</p>
       </div>
-      
       <div className="bg-white p-6 rounded-lg shadow-md">
         <form onSubmit={handleProfileSubmit} className="space-y-4">
           <h3 className="text-2xl font-semibold">Edit Your Details</h3>
@@ -139,7 +125,6 @@ function InstructorProfilePage() {
           <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Profile</button>
         </form>
       </div>
-
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-2xl font-semibold">My Weekly Availability</h3>
         <p className="text-gray-600 mb-4">Check the boxes for the times you are available to teach.</p>
@@ -151,7 +136,7 @@ function InstructorProfilePage() {
                 {timeSlots.map(slot => (
                   <div key={slot}>
                     <label className="flex items-center">
-                      <input type="checkbox" checked={availability[day]?.has(slot) || false} onChange={() => handleAvailabilityChange(day, slot)} className="mr-2 h-4 w-4 rounded border-gray-300 text-primary focus:ring-blue-500"/>
+                      <input type="checkbox" checked={availability[day]?.has(slot) || false} onChange={() => handleAvailabilityChange(day, slot)} className="mr-2 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"/>
                       {slot}
                     </label>
                   </div>

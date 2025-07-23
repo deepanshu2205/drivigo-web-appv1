@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import apiUrl from '../apiConfig'; // <-- Import the api URL
 
 function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -15,10 +16,11 @@ function DashboardPage() {
       setUser(decodedToken);
       
       const fetchBookings = async () => {
+        setLoading(true);
         try {
           const endpoint = decodedToken.role === 'instructor' 
-            ? '/api/instructor/bookings' 
-            : '/api/learner/bookings';
+            ? `${apiUrl}/api/instructor/bookings` 
+            : `${apiUrl}/api/learner/bookings`;
             
           const response = await fetch(endpoint, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -29,21 +31,19 @@ function DashboardPage() {
         } catch (error) {
           console.error(error);
         } finally {
-          // This ensures loading is set to false AFTER the fetch is complete
           setLoading(false);
         }
       };
       
       fetchBookings();
     } else {
-      // Also set loading to false if there's no token
-      setLoading(false);
+        setLoading(false);
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    navigate('/');
+    window.location.href = '/';
   };
 
   if (loading) {
@@ -51,12 +51,9 @@ function DashboardPage() {
   }
   
   if (!user) {
-    // This will handle the case where the user is not logged in but the page is accessed
     return <div>Please log in to see your dashboard.</div>;
   }
 
-
-  // --- JSX for the Learner Dashboard ---
   const renderLearnerDashboard = () => (
     <div className="learner-dashboard bg-white p-6 rounded-lg shadow">
       <h2 className="text-2xl font-semibold mb-4">My Dashboard</h2>
@@ -93,7 +90,6 @@ function DashboardPage() {
     </div>
   );
 
-  // --- JSX for the Instructor Dashboard ---
   const renderInstructorDashboard = () => (
     <div className="instructor-dashboard bg-white p-6 rounded-lg shadow">
       <h2 className="text-2xl font-semibold mb-4">Instructor Menu</h2>

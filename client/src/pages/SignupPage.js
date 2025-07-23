@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // To redirect user after signup
+import { useNavigate } from 'react-router-dom';
+import apiUrl from '../apiConfig'; // <-- Import the api URL
 
 function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('learner'); // Default role
-  const [message, setMessage] = useState(''); // To show success/error messages
+  const [role, setRole] = useState('learner');
+  const [message, setMessage] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent the form from refreshing the page
-    setMessage(''); // Clear previous messages
+    event.preventDefault();
+    setMessage('');
 
     try {
-      const response = await fetch('/api/register', {
+      // Use the apiUrl variable in the fetch call
+      const response = await fetch(`${apiUrl}/api/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -24,17 +26,13 @@ function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        // If server responds with an error (e.g., email already exists)
         throw new Error(data.message || 'Failed to register.');
       }
 
-      // If registration is successful
-      setMessage('Registration successful! You can now log in.');
-      // Optional: redirect to login page after a short delay
-      // setTimeout(() => navigate('/login'), 2000);
+      setMessage('Registration successful! Redirecting to login...');
+      setTimeout(() => navigate('/login'), 2000);
 
     } catch (error) {
-      // Set the error message to display to the user
       setMessage(error.message);
     }
   };
