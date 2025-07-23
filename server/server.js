@@ -1,3 +1,4 @@
+const cors = require('cors');
 require('dotenv').config();
 const crypto = require('crypto');
 const Razorpay = require('razorpay');
@@ -9,6 +10,7 @@ const authMiddleware = require('./authMiddleware');
 
 const app = express();
 app.use(express.json()); 
+app.use(cors());
 const port = 5000;
 
 // --- RAZORPAY CONFIGURATION ---
