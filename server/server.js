@@ -10,7 +10,26 @@ const authMiddleware = require('./authMiddleware');
 
 const app = express();
 app.use(express.json()); 
-app.use(cors());
+
+const cors = require('cors');
+
+const allowedOrigins = [
+  'http://localhost:3000', // For your local development
+  'https://drivigo-web-appv1.vercel.app/' // <-- PASTE YOUR VERCEL URL HERE
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
+
 const port = 5000;
 
 // --- RAZORPAY CONFIGURATION ---
