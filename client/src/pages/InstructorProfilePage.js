@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import apiUrl from '../apiConfig'; // <-- Import the api URL
+import apiUrl from '../apiConfig';
 
 const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const timeSlots = ['07:00-08:00', '08:00-09:00', '09:00-10:00', '16:00-17:00', '17:00-18:00'];
@@ -7,7 +7,15 @@ const timeSlots = ['07:00-08:00', '08:00-09:00', '09:00-10:00', '16:00-17:00', '
 function InstructorProfilePage() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState({ car_model: '', photo_url: '' });
+  
+  // Updated state to hold all form fields
+  const [formData, setFormData] = useState({
+    name: '',
+    car_model: '',
+    photo_url: '',
+    phone_number: '',
+    service_address: '' // New field for the address
+  });
   const [availability, setAvailability] = useState({});
 
   useEffect(() => {
@@ -27,7 +35,14 @@ function InstructorProfilePage() {
         const availabilityData = await availabilityRes.json();
         
         setProfile(profileData);
-        setFormData({ car_model: profileData.car_model || '', photo_url: profileData.photo_url || '' });
+        // Pre-fill the form with all the new data
+        setFormData({
+          name: profileData.name || '',
+          car_model: profileData.car_model || '',
+          photo_url: profileData.photo_url || '',
+          phone_number: profileData.phone_number || '',
+          service_address: '' // Leave blank for user to update
+        });
         
         const availabilityObj = {};
         availabilityData.forEach(item => {
@@ -111,20 +126,42 @@ function InstructorProfilePage() {
         <h2 className="text-3xl font-bold">My Instructor Profile</h2>
         <p className="text-lg text-gray-600"><strong>Email:</strong> {profile.email}</p>
       </div>
+      
       <div className="bg-white p-6 rounded-lg shadow-md">
         <form onSubmit={handleProfileSubmit} className="space-y-4">
           <h3 className="text-2xl font-semibold">Edit Your Details</h3>
+          
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
+            <input type="text" name="name" value={formData.name} onChange={handleProfileChange} placeholder="e.g., John Doe" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+          </div>
+          
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
+            <input type="text" name="phone_number" value={formData.phone_number} onChange={handleProfileChange} placeholder="e.g., 919876543210" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+          </div>
+
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Car Model:</label>
             <input type="text" name="car_model" value={formData.car_model} onChange={handleProfileChange} placeholder="e.g., Maruti Swift" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
           </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm font-bold mb-2">Service Area Address:</label>
+            <input type="text" name="service_address" value={formData.service_address} onChange={handleProfileChange} placeholder="e.g., Saket, New Delhi" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <p className="text-xs text-gray-500 mt-1">Enter an address to set the center of your service area.</p>
+          </div>
+
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
             <input type="text" name="photo_url" value={formData.photo_url} onChange={handleProfileChange} placeholder="http://example.com/photo.jpg" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+             <p className="text-xs text-gray-500 mt-1">For now, please paste a link to your photo.</p>
           </div>
+
           <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Profile</button>
         </form>
       </div>
+
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-2xl font-semibold">My Weekly Availability</h3>
         <p className="text-gray-600 mb-4">Check the boxes for the times you are available to teach.</p>
