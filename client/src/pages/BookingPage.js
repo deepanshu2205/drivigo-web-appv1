@@ -175,7 +175,8 @@ function BookingPage() {
             {instructors.map(instructor => (
               <div key={instructor.id} className="p-4 border rounded-lg shadow-lg bg-gray-50 flex flex-col justify-between">
                 <div>
-                  <h4 className="font-bold text-lg">{instructor.instructor_email}</h4>
+                  <h4 className="font-bold text-lg">{instructor.instructor_name}</h4>
+                  <p className="font-bold text-lg">{instructor.instructor_email}</p>
                   <p className="text-gray-600">Car: {instructor.car_model}</p>
                 </div>
                 <button onClick={() => handleSelectInstructor(instructor)} className="mt-4 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
