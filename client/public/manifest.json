@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Drivigo",
+  "name": "Drivigo - Learn Driving with Verified Instructors",
+  "description": "Book driving lessons with verified instructors and track your progress. Learn driving safely and confidently with Drivigo.",
   "icons": [
     {
       "src": "favicon.ico",
@@ -8,18 +9,94 @@
       "type": "image/x-icon"
     },
     {
-      "src": "logo192.png",
+      "src": "icon-192x192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
-      "src": "logo512.png",
+      "src": "icon-512x512.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#3B82F6",
+  "background_color": "#F3F4F6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en-US",
+  "categories": ["education", "transport", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Drivigo Desktop Experience"
+    },
+    {
+      "src": "screenshot-mobile.png",
+      "sizes": "360x640",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Drivigo Mobile Experience"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book a Lesson",
+      "short_name": "Book",
+      "description": "Quickly book a new driving lesson",
+      "url": "/book-lesson",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Progress",
+      "short_name": "Progress",
+      "description": "View your learning progress",
+      "url": "/progress",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Access your dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "file_handlers": [],
+  "protocol_handlers": [],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

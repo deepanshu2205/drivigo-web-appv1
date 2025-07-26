@@ -12,13 +12,18 @@
   "type": "commonjs",
   "dependencies": {
     "@mapbox/mapbox-sdk": "^0.16.1",
+    "@types/web-push": "^3.6.4",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
-    "razorpay": "^2.9.6"
+    "razorpay": "^2.9.6",
+    "twilio": "^5.8.0",
+    "uuid": "^11.1.0",
+    "web-push": "^3.6.7"
   }
 }
