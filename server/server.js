@@ -19,7 +19,8 @@ app.use(express.json());
 
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://drivigo-web-appv1.vercel.app'
+  'https://drivigo-web-appv1.vercel.app',
+  'https://drivigo-web-appv1-git-cursor-enha-dbd96a-deepanshu-drivigo-team.vercel.app'
 ];
 app.use(cors({
   origin: function (origin, callback) {
