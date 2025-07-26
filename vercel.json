@@ -1,7 +1,9 @@
 {
-  "buildCommand": "cd client && npm run build",
+  "version": 2,
+  "name": "drivigo-react-app",
+  "buildCommand": "cd client && npm ci && npm run build",
   "outputDirectory": "client/build",
-  "installCommand": "cd client && npm install",
+  "installCommand": "cd client && npm ci",
   "framework": null,
   "rewrites": [
     {
