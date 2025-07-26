@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import apiUrl from '../apiConfig';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -10,7 +10,6 @@ function DashboardPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState({ type: '', message: '' });
-  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');

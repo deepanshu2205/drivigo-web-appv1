@@ -229,13 +229,13 @@ function SignupPage() {
                 />
                 <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-600">
                   I agree to the{' '}
-                  <a href="#" className="text-primary hover:text-primary-hover font-medium">
+                  <button type="button" className="text-primary hover:text-primary-hover font-medium">
                     Terms of Service
-                  </a>
+                  </button>
                   {' '}and{' '}
-                  <a href="#" className="text-primary hover:text-primary-hover font-medium">
+                  <button type="button" className="text-primary hover:text-primary-hover font-medium">
                     Privacy Policy
-                  </a>
+                  </button>
                 </label>
               </div>
 
@@ -276,9 +276,9 @@ function SignupPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-500">
             By creating an account, you agree to our{' '}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <button className="text-primary hover:underline">Terms of Service</button>
             {' '}and{' '}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <button className="text-primary hover:underline">Privacy Policy</button>
           </p>
         </div>
       </div>

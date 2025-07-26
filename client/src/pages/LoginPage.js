@@ -133,9 +133,9 @@ function LoginPage() {
                   </label>
                 </div>
                 <div className="text-sm">
-                  <a href="#" className="text-primary hover:text-primary-hover font-medium">
+                  <button className="text-primary hover:text-primary-hover font-medium">
                     Forgot password?
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -176,9 +176,9 @@ function LoginPage() {
         <div className="mt-8 text-center">
           <p className="text-xs text-gray-500">
             By signing in, you agree to our{' '}
-            <a href="#" className="text-primary hover:underline">Terms of Service</a>
+            <button className="text-primary hover:underline">Terms of Service</button>
             {' '}and{' '}
-            <a href="#" className="text-primary hover:underline">Privacy Policy</a>
+            <button className="text-primary hover:underline">Privacy Policy</button>
           </p>
         </div>
       </div>
