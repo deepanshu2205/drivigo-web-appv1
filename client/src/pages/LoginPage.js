@@ -1,16 +1,18 @@
 import apiUrl from '../apiConfig';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage('');
+    setIsLoading(true);
 
     try {
       const response = await fetch(`${apiUrl}/api/login`,{
@@ -31,49 +33,106 @@ function LoginPage() {
 
       // 2. Redirect the user to the dashboard
       setMessage('Login successful! Redirecting...');
-      navigate('/dashboard');
+      setTimeout(() => navigate('/dashboard'), 1500);
 
     } catch (error) {
       setMessage(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-  <div className="flex items-center justify-center min-h-screen bg-gray-100">
-    <div className="p-8 max-w-md w-full bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-6">Login to Your Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          />
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-secondary-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-4">
+            <span className="text-white font-bold text-xl">D</span>
+          </div>
+          <h2 className="text-3xl font-display font-bold text-secondary-900">
+            Welcome back
+          </h2>
+          <p className="mt-2 text-secondary-600">
+            Sign in to your account to continue
+          </p>
         </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
-          />
-        </div>
-        <div className="flex items-center justify-between">
-          <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-            Log In
-          </button>
-        </div>
-      </form>
-      {message && <p className="text-center text-red-500 text-xs mt-4">{message}</p>}
-    </div>
-  </div>
-);
 
+        {/* Form */}
+        <div className="card">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-secondary-700 mb-2">
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="input-field"
+                placeholder="Enter your email"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-secondary-700 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="input-field"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            <div>
+              <button 
+                type="submit" 
+                disabled={isLoading}
+                className="btn-primary w-full flex justify-center items-center"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Signing in...
+                  </>
+                ) : (
+                  'Sign in'
+                )}
+              </button>
+            </div>
+          </form>
+
+          {/* Message */}
+          {message && (
+            <div className={`mt-4 p-3 rounded-lg text-sm ${
+              message.includes('successful') 
+                ? 'bg-success-50 text-success-700 border border-success-200' 
+                : 'bg-error-50 text-error-700 border border-error-200'
+            }`}>
+              {message}
+            </div>
+          )}
+
+          {/* Sign up link */}
+          <div className="mt-6 text-center">
+            <p className="text-secondary-600">
+              Don't have an account?{' '}
+              <Link to="/signup" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+                Sign up here
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default LoginPage;
