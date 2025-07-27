@@ -17,6 +17,7 @@ function BookingPage() {
 
   const [instructors, setInstructors] = useState([]);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -33,6 +34,7 @@ function BookingPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${apiUrl}/api/instructors/find`, {
@@ -49,6 +51,8 @@ function BookingPage() {
     } catch (error) {
       console.error('Booking submission error:', error);
       alert('An error occurred. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,7 +70,7 @@ function BookingPage() {
       const learner = jwtDecode(token);
 
       const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY_ID, // Also using an env variable here is best practice
+        key: process.env.REACT_APP_RAZORPAY_KEY_ID,
         amount: order.amount,
         currency: order.currency,
         name: 'Drivigo',
@@ -110,85 +114,255 @@ function BookingPage() {
   };
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <div className="mb-6">
-        <h2 className="text-3xl font-bold">Book Your Driving Session</h2>
-        <p className="text-gray-600">Fill out the details below to find an available instructor.</p>
+    <div className="animate-fade-in">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-primary-50 to-secondary-50 py-12">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl lg:text-5xl font-display font-bold text-secondary-900 mb-4">
+            Book Your <span className="text-gradient">Driving Session</span>
+          </h1>
+          <p className="text-xl text-secondary-600 max-w-2xl mx-auto">
+            Fill out the details below to find an available instructor in your area.
+          </p>
+        </div>
       </div>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Start Date:</label>
-            <input type="date" name="startDate" value={bookingDetails.startDate} onChange={handleChange} required className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-bold mb-2">Preferred Time Slot:</label>
-            <select name="timeSlot" value={bookingDetails.timeSlot} onChange={handleChange} required className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-              <option value="">Select a time</option>
-              <option value="07:00-08:00">7:00 AM - 8:00 AM</option>
-              <option value="08:00-09:00">8:00 AM - 9:00 AM</option>
-              <option value="09:00-10:00">9:00 AM - 10:00 AM</option>
-              <option value="16:00-17:00">4:00 PM - 5:00 PM</option>
-              <option value="17:00-18:00">5:00 PM - 6:00 PM</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2">Pickup/Drop Location:</label>
-          <p className="text-xs text-gray-500 mb-2">Drag the pin to set your exact location.</p>
-          <div style={{ height: '400px', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
-            <Map
-              initialViewState={{
-                longitude: bookingDetails.location.longitude,
-                latitude: bookingDetails.location.latitude,
-                zoom: 11
-              }}
-              mapboxAccessToken={MAPBOX_TOKEN}
-              mapStyle="mapbox://styles/mapbox/streets-v11"
-            >
-              <Marker 
-                longitude={bookingDetails.location.longitude} 
-                latitude={bookingDetails.location.latitude} 
-                anchor="bottom"
-                draggable={true}
-                onDragEnd={(e) => handleLocationChange(e.lngLat)}
-              />
-            </Map>
-          </div>
-        </div>
-        <div>
-          <label className="block text-gray-700 text-sm font-bold mb-2">Session Plan:</label>
-          <div className="flex space-x-4">
-            <label className="flex items-center"><input type="radio" name="sessionPlan" value="7-day" checked={bookingDetails.sessionPlan === '7-day'} onChange={handleChange} className="mr-2"/> 7 days (1 hour/day)</label>
-            <label className="flex items-center"><input type="radio" name="sessionPlan" value="14-day" checked={bookingDetails.sessionPlan === '14-day'} onChange={handleChange} className="mr-2"/> 14 days (30 mins/day)</label>
-          </div>
-        </div>
-        <button type="submit" className="w-full bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          Find Instructors
-        </button>
-      </form>
-      <hr className="my-8" />
-      <div className="instructor-results">
-        <h3 className="text-2xl font-bold mb-4">Available Instructors</h3>
-        {instructors.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {instructors.map(instructor => (
-              <div key={instructor.id} className="p-4 border rounded-lg shadow-lg bg-gray-50 flex flex-col justify-between">
+
+      {/* Booking Form Section */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="card">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Date and Time Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h4 className="font-bold text-lg">{instructor.instructor_name}</h4>
-                  <p className="font-bold text-lg">{instructor.instructor_email}</p>
-                  <p className="text-gray-600">Car: {instructor.car_model}</p>
+                  <label className="block text-sm font-medium text-secondary-700 mb-2">
+                    Start Date
+                  </label>
+                  <input 
+                    type="date" 
+                    name="startDate" 
+                    value={bookingDetails.startDate} 
+                    onChange={handleChange} 
+                    required 
+                    className="input-field"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
                 </div>
-                <button onClick={() => handleSelectInstructor(instructor)} className="mt-4 w-full bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                  Choose & Proceed to Pay
+                <div>
+                  <label className="block text-sm font-medium text-secondary-700 mb-2">
+                    Preferred Time Slot
+                  </label>
+                  <select 
+                    name="timeSlot" 
+                    value={bookingDetails.timeSlot} 
+                    onChange={handleChange} 
+                    required 
+                    className="input-field"
+                  >
+                    <option value="">Select a time</option>
+                    <option value="07:00-08:00">7:00 AM - 8:00 AM</option>
+                    <option value="08:00-09:00">8:00 AM - 9:00 AM</option>
+                    <option value="09:00-10:00">9:00 AM - 10:00 AM</option>
+                    <option value="16:00-17:00">4:00 PM - 5:00 PM</option>
+                    <option value="17:00-18:00">5:00 PM - 6:00 PM</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Location Selection */}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
+                  Pickup/Drop Location
+                </label>
+                <p className="text-sm text-secondary-500 mb-4">
+                  Drag the pin to set your exact location for pickup and drop.
+                </p>
+                <div className="border border-secondary-200 rounded-lg overflow-hidden">
+                  <div style={{ height: '400px', width: '100%' }}>
+                    <Map
+                      initialViewState={{
+                        longitude: bookingDetails.location.longitude,
+                        latitude: bookingDetails.location.latitude,
+                        zoom: 11
+                      }}
+                      mapboxAccessToken={MAPBOX_TOKEN}
+                      mapStyle="mapbox://styles/mapbox/streets-v11"
+                    >
+                      <Marker 
+                        longitude={bookingDetails.location.longitude} 
+                        latitude={bookingDetails.location.latitude} 
+                        anchor="bottom"
+                        draggable={true}
+                        onDragEnd={(e) => handleLocationChange(e.lngLat)}
+                      />
+                    </Map>
+                  </div>
+                </div>
+              </div>
+
+              {/* Session Plan Selection */}
+              <div>
+                <label className="block text-sm font-medium text-secondary-700 mb-4">
+                  Session Plan
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <label className="relative">
+                    <input 
+                      type="radio" 
+                      name="sessionPlan" 
+                      value="7-day" 
+                      checked={bookingDetails.sessionPlan === '7-day'} 
+                      onChange={handleChange} 
+                      className="sr-only"
+                    />
+                    <div className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                      bookingDetails.sessionPlan === '7-day' 
+                        ? 'border-primary-500 bg-primary-50 text-primary-700' 
+                        : 'border-secondary-200 bg-white text-secondary-700 hover:border-secondary-300'
+                    }`}>
+                      <div className="text-center">
+                        <div className="text-2xl font-display font-bold mb-2">7 Days</div>
+                        <div className="text-sm">1 hour per day</div>
+                        <div className="text-lg font-semibold mt-2">₹5,000</div>
+                      </div>
+                    </div>
+                  </label>
+                  
+                  <label className="relative">
+                    <input 
+                      type="radio" 
+                      name="sessionPlan" 
+                      value="14-day" 
+                      checked={bookingDetails.sessionPlan === '14-day'} 
+                      onChange={handleChange} 
+                      className="sr-only"
+                    />
+                    <div className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
+                      bookingDetails.sessionPlan === '14-day' 
+                        ? 'border-primary-500 bg-primary-50 text-primary-700' 
+                        : 'border-secondary-200 bg-white text-secondary-700 hover:border-secondary-300'
+                    }`}>
+                      <div className="text-center">
+                        <div className="text-2xl font-display font-bold mb-2">14 Days</div>
+                        <div className="text-sm">30 minutes per day</div>
+                        <div className="text-lg font-semibold mt-2">₹7,000</div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              {/* Find Instructors Button */}
+              <div className="text-center">
+                <button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="btn-primary text-lg px-12 py-4 flex items-center justify-center mx-auto"
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                      Finding Instructors...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                      Find Instructors
+                    </>
+                  )}
                 </button>
               </div>
-            ))}
+            </form>
           </div>
-        ) : (
-          <p className="text-gray-500">No instructors found for the selected criteria. Please try different options.</p>
-        )}
-      </div>
+        </div>
+      </section>
+
+      {/* Available Instructors Section */}
+      {instructors.length > 0 && (
+        <section className="py-12 bg-secondary-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-display font-bold text-secondary-900 mb-4">
+                Available Instructors
+              </h2>
+              <p className="text-xl text-secondary-600">
+                Choose from our verified instructors in your area
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {instructors.map(instructor => (
+                <div key={instructor.id} className="card-hover">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-white font-bold text-xl">
+                        {instructor.instructor_name?.charAt(0) || 'I'}
+                      </span>
+                    </div>
+                    <h3 className="text-xl font-display font-semibold text-secondary-900 mb-2">
+                      {instructor.instructor_name || 'Instructor'}
+                    </h3>
+                    <p className="text-secondary-600 mb-2">
+                      {instructor.instructor_email}
+                    </p>
+                    <div className="flex items-center justify-center space-x-2 text-sm text-secondary-500">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <span>{instructor.car_model || 'Car Model'}</span>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={() => handleSelectInstructor(instructor)} 
+                    disabled={isVerifying}
+                    className="btn-success w-full flex items-center justify-center"
+                  >
+                    {isVerifying ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
+                        Choose & Proceed to Pay
+                      </>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* No Results Message */}
+      {instructors.length === 0 && (
+        <section className="py-12 bg-secondary-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="card">
+              <div className="text-6xl mb-4">🔍</div>
+              <h3 className="text-2xl font-display font-bold text-secondary-900 mb-4">
+                No Instructors Found
+              </h3>
+              <p className="text-secondary-600 mb-6">
+                No instructors are available for the selected criteria. Please try different options or contact us for assistance.
+              </p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="btn-secondary"
+              >
+                Try Different Options
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

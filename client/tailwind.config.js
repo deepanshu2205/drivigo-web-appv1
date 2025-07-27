@@ -12,11 +12,11 @@ module.exports = {
           200: '#fed7aa',
           300: '#fdba74',
           400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          500: '#ffbd40', // Your specified color
+          600: '#e6a22a', // Slightly darker for hover
+          700: '#d4941f', // Even darker for active states
+          800: '#b37a1a',
+          900: '#8f5f15',
         },
         secondary: {
           50: '#f8fafc',
