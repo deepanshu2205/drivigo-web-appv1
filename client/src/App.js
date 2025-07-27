@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
 // Import all pages and components
@@ -20,6 +20,7 @@ function App() {
     const navigate = useNavigate();
     const location = useLocation();
     const token = localStorage.getItem('token');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
       localStorage.removeItem('token');
@@ -31,6 +32,14 @@ function App() {
       return location.pathname === path;
     };
 
+    const toggleMobileMenu = () => {
+      setIsMobileMenuOpen(!isMobileMenuOpen);
+    };
+
+    const closeMobileMenu = () => {
+      setIsMobileMenuOpen(false);
+    };
+
     return (
       <div className="min-h-screen bg-secondary-50 flex flex-col">
         {/* --- MODERN NAVIGATION BAR --- */}
@@ -39,7 +48,7 @@ function App() {
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
               <div className="flex-shrink-0">
-                <Link to="/" className="flex items-center space-x-2">
+                <Link to="/" className="flex items-center space-x-2" onClick={closeMobileMenu}>
                   <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-lg">D</span>
                   </div>
@@ -98,13 +107,107 @@ function App() {
 
               {/* Mobile menu button */}
               <div className="md:hidden">
-                <button className="text-secondary-700 hover:text-primary-600 p-2">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
+                <button 
+                  onClick={toggleMobileMenu}
+                  className="text-secondary-700 hover:text-primary-600 p-2 transition-colors"
+                  aria-label="Toggle mobile menu"
+                >
+                  {isMobileMenuOpen ? (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  ) : (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
+
+            {/* Mobile Navigation Menu */}
+            {isMobileMenuOpen && (
+              <div className="md:hidden">
+                <div className="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-secondary-100">
+                  <Link 
+                    to="/" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActive('/') 
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    Home
+                  </Link>
+                  <Link 
+                    to="/about" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActive('/about') 
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    About
+                  </Link>
+                  <Link 
+                    to="/contact" 
+                    className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                      isActive('/contact') 
+                        ? 'text-primary-600 bg-primary-50' 
+                        : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50'
+                    }`}
+                    onClick={closeMobileMenu}
+                  >
+                    Contact
+                  </Link>
+
+                  {/* Conditional Mobile Links */}
+                  {token ? (
+                    <>
+                      <Link 
+                        to="/dashboard" 
+                        className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
+                          isActive('/dashboard') 
+                            ? 'text-primary-600 bg-primary-50' 
+                            : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50'
+                        }`}
+                        onClick={closeMobileMenu}
+                      >
+                        Dashboard
+                      </Link>
+                      <button 
+                        onClick={() => {
+                          handleLogout();
+                          closeMobileMenu();
+                        }} 
+                        className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-error-600 hover:text-error-700 hover:bg-error-50 transition-colors"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link 
+                        to="/signup" 
+                        className="block px-3 py-2 rounded-md text-base font-medium bg-secondary-100 text-secondary-700 hover:bg-secondary-200 transition-colors"
+                        onClick={closeMobileMenu}
+                      >
+                        Sign Up
+                      </Link>
+                      <Link 
+                        to="/login" 
+                        className="block px-3 py-2 rounded-md text-base font-medium bg-primary-500 text-white hover:bg-primary-600 transition-colors"
+                        onClick={closeMobileMenu}
+                      >
+                        Login
+                      </Link>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </nav>
 
