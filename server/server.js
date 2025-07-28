@@ -9,10 +9,85 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const authMiddleware = require('./authMiddleware');
 const mbxGeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const http = require('http');
+const socketIo = require('socket.io');
 
 // --- App & Port Setup ---
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: [
+      'http://localhost:3000',
+      'https://drivigo-web-appv1.vercel.app',
+      'https://drivigo-web-appv1-git-cursor-enha-dbd96a-deepanshu-drivigo-team.vercel.app'
+    ],
+    methods: ["GET", "POST"]
+  }
+});
 const port = 5000;
+
+// --- WebSocket Connection Management ---
+const connectedUsers = new Map(); // userId -> socket
+
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  
+  socket.on('authenticate', (token) => {
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      connectedUsers.set(decoded.userId, socket);
+      socket.userId = decoded.userId;
+      socket.userRole = decoded.role;
+      console.log(`User ${decoded.userId} (${decoded.role}) authenticated`);
+    } catch (error) {
+      console.error('Authentication failed:', error);
+    }
+  });
+  
+  socket.on('disconnect', () => {
+    if (socket.userId) {
+      connectedUsers.delete(socket.userId);
+      console.log(`User ${socket.userId} disconnected`);
+    }
+  });
+});
+
+// --- Notification Helper Functions ---
+const sendNotificationToInstructor = async (instructorUserId, notificationData) => {
+  try {
+    // Save notification to database
+    const query = `
+      INSERT INTO notifications (user_id, type, title, message, data, is_read)
+      VALUES ($1, $2, $3, $4, $5, false)
+      RETURNING id;
+    `;
+    const values = [
+      instructorUserId,
+      notificationData.type,
+      notificationData.title,
+      notificationData.message,
+      JSON.stringify(notificationData.data)
+    ];
+    
+    const result = await pool.query(query, values);
+    const notificationId = result.rows[0].id;
+    
+    // Send real-time notification via WebSocket
+    const instructorSocket = connectedUsers.get(instructorUserId);
+    if (instructorSocket) {
+      instructorSocket.emit('newNotification', {
+        id: notificationId,
+        ...notificationData,
+        timestamp: new Date().toISOString()
+      });
+    }
+    
+    return notificationId;
+  } catch (error) {
+    console.error('Error sending notification:', error);
+  }
+};
 
 // --- Middleware ---
 app.use(express.json());
@@ -164,6 +239,21 @@ app.post('/api/payment/verify', async (req, res) => {
       const query = `INSERT INTO bookings (learner_user_id, instructor_user_id, session_plan, start_date, time_slot, razorpay_payment_id, status) VALUES ($1, $2, $3, $4, $5, $6, 'confirmed') RETURNING id;`;
       const values = [learner.userId, instructor.user_id, bookingDetails.sessionPlan, bookingDetails.startDate, bookingDetails.timeSlot, razorpay_payment_id];
       const newBooking = await pool.query(query, values);
+      
+      // Send notification to instructor about new booking
+      await sendNotificationToInstructor(instructor.user_id, {
+        type: 'new_booking',
+        title: 'New Booking Received! 🎉',
+        message: `You have a new booking from ${learner.email} for ${bookingDetails.sessionPlan} on ${new Date(bookingDetails.startDate).toLocaleDateString()} at ${bookingDetails.timeSlot}`,
+        data: {
+          bookingId: newBooking.rows[0].id,
+          learnerEmail: learner.email,
+          sessionPlan: bookingDetails.sessionPlan,
+          startDate: bookingDetails.startDate,
+          timeSlot: bookingDetails.timeSlot
+        }
+      });
+      
       res.json({ status: 'success', message: 'Payment verified!', bookingId: newBooking.rows[0].id });
     } else {
       res.status(400).json({ status: 'failure', message: 'Payment verification failed.' });
@@ -342,7 +432,78 @@ app.get('/api/booking/:bookingId', authMiddleware, async (req, res) => {
   }
 });
 
+// GET USER NOTIFICATIONS
+app.get('/api/notifications', authMiddleware, async (req, res) => {
+  try {
+    const query = `
+      SELECT id, type, title, message, data, is_read, created_at
+      FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 50;
+    `;
+    const { rows } = await pool.query(query, [req.user.userId]);
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// MARK NOTIFICATION AS READ
+app.put('/api/notifications/:notificationId/read', authMiddleware, async (req, res) => {
+  try {
+    const { notificationId } = req.params;
+    const query = `
+      UPDATE notifications
+      SET is_read = true
+      WHERE id = $1 AND user_id = $2
+      RETURNING id;
+    `;
+    const { rows } = await pool.query(query, [notificationId, req.user.userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Notification not found.' });
+    }
+    res.json({ message: 'Notification marked as read' });
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// MARK ALL NOTIFICATIONS AS READ
+app.put('/api/notifications/read-all', authMiddleware, async (req, res) => {
+  try {
+    const query = `
+      UPDATE notifications
+      SET is_read = true
+      WHERE user_id = $1 AND is_read = false;
+    `;
+    await pool.query(query, [req.user.userId]);
+    res.json({ message: 'All notifications marked as read' });
+  } catch (error) {
+    console.error('Error marking all notifications as read:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// GET UNREAD NOTIFICATION COUNT
+app.get('/api/notifications/unread-count', authMiddleware, async (req, res) => {
+  try {
+    const query = `
+      SELECT COUNT(*) as count
+      FROM notifications
+      WHERE user_id = $1 AND is_read = false;
+    `;
+    const { rows } = await pool.query(query, [req.user.userId]);
+    res.json({ count: parseInt(rows[0].count) });
+  } catch (error) {
+    console.error('Error fetching unread notification count:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // --- Server Listen ---
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
