@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import apiUrl from '../apiConfig';
 import LoadingSpinner from '../components/LoadingSpinner';
+import NotificationBell from '../components/NotificationBell';
 
 function DashboardPage() {
   const [user, setUser] = useState(null);
@@ -224,15 +225,18 @@ function DashboardPage() {
                 Welcome back, <span className="font-semibold text-primary-600">{user.role}</span>!
               </p>
             </div>
-            <button 
-              onClick={handleLogout} 
-              className="btn-danger mt-4 sm:mt-0"
-            >
-              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Logout
-            </button>
+            <div className="flex items-center space-x-4 mt-4 sm:mt-0">
+              {user.role === 'instructor' && <NotificationBell />}
+              <button 
+                onClick={handleLogout} 
+                className="btn-danger"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>

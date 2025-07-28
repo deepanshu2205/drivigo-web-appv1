@@ -13,6 +13,7 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
+import { NotificationProvider } from './components/NotificationContext';
 
 function App() {
   // We need to wrap the logic in a component to use the useNavigate hook
@@ -235,7 +236,9 @@ function App() {
 
   return (
     <Router>
-      <AppContent />
+      <NotificationProvider>
+        <AppContent />
+      </NotificationProvider>
     </Router>
   );
 }
