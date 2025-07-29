@@ -6,7 +6,7 @@
 
 /* Gradient Text */
 .text-gradient {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffbd40 0%, #e6a22a 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -14,7 +14,7 @@
 
 /* Gradient Background */
 .bg-gradient-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffbd40 0%, #e6a22a 100%);
 }
 
 /* Custom Animations */
@@ -103,4 +103,14 @@
 /* Notification sound fallback */
 .notification-sound {
   display: none;
+}
+
+.input-field {
+  @apply w-full px-4 py-3 border border-secondary-200 rounded-lg text-base text-secondary-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200;
+}
+.input-field:disabled {
+  @apply bg-secondary-100 text-secondary-400;
+}
+.dark .input-field {
+  @apply bg-secondary-800 text-secondary-100 border-secondary-600;
 }

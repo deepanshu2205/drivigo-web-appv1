@@ -2,9 +2,23 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNotifications } from './NotificationContext';
 
 const NotificationBell = () => {
-  const { unreadCount, notifications, markAsRead, markAllAsRead } = useNotifications();
+  const { unreadCount, notifications, markAsRead, markAllAsRead, playNotificationSound } = useNotifications();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Play sound on notification (for mobile reliability, add a hidden audio element and trigger play)
+  useEffect(() => {
+    // Listen for custom event from NotificationContext
+    const handler = () => {
+      const audio = document.getElementById('notification-audio');
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+    };
+    window.addEventListener('drivigo-notification-sound', handler);
+    return () => window.removeEventListener('drivigo-notification-sound', handler);
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -54,8 +68,8 @@ const NotificationBell = () => {
         );
       default:
         return (
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
@@ -65,16 +79,21 @@ const NotificationBell = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/* Hidden audio for notification sound (for mobile) */}
+      <audio id="notification-audio" src="/notification-sound.mp3" preload="auto" style={{ display: 'none' }} />
       {/* Notification Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-full transition-colors duration-200"
+        className="relative p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500"
         aria-label="Notifications"
+        style={{
+          position: 'relative',
+          zIndex: 60,
+        }}
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM10.5 3.75a6 6 0 00-6 6v3.75l-2.25 2.25v3h15v-3L15.75 12.75V9.75a6 6 0 00-6-6z" />
         </svg>
-        
         {/* Unread Count Badge */}
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
@@ -82,16 +101,13 @@ const NotificationBell = () => {
           </span>
         )}
       </button>
-
-      {/* Notification Dropdown */}
+      {/* Notification Dropdown - Responsive for mobile */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-secondary-200 z-50 max-h-96 overflow-hidden">
-          {/* Header */}
-          <div className="px-4 py-3 border-b border-secondary-200 bg-secondary-50">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-secondary-900">
-                Notifications
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-start sm:justify-end sm:inset-auto sm:absolute sm:right-0 sm:mt-2 w-full sm:w-80 bg-white sm:rounded-lg shadow-lg border border-secondary-200 max-h-[80vh] sm:max-h-96 overflow-hidden animate-fade-in">
+          <div className="w-full max-h-[80vh] sm:max-h-96 overflow-y-auto">
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-secondary-200 bg-secondary-50 flex items-center justify-between sticky top-0 z-10">
+              <h3 className="text-sm font-semibold text-secondary-900">Notifications</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
@@ -100,59 +116,64 @@ const NotificationBell = () => {
                   Mark all as read
                 </button>
               )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="ml-2 text-secondary-400 hover:text-secondary-700 focus:outline-none"
+                aria-label="Close notifications"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-          </div>
-
-          {/* Notification List */}
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.length > 0 ? (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  onClick={() => handleNotificationClick(notification)}
-                  className={`px-4 py-3 border-b border-secondary-100 cursor-pointer transition-colors duration-200 hover:bg-secondary-50 ${
-                    !notification.is_read ? 'bg-blue-50' : ''
-                  }`}
-                >
-                  <div className="flex items-start space-x-3">
-                    {getNotificationIcon(notification.type)}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between">
-                        <p className={`text-sm font-medium ${
-                          !notification.is_read ? 'text-secondary-900' : 'text-secondary-700'
-                        }`}>
-                          {notification.title}
+            {/* Notification List */}
+            <div>
+              {notifications.length > 0 ? (
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    onClick={() => handleNotificationClick(notification)}
+                    className={`px-4 py-3 border-b border-secondary-100 cursor-pointer transition-colors duration-200 hover:bg-secondary-50 ${
+                      !notification.is_read ? 'bg-primary-50' : ''
+                    }`}
+                  >
+                    <div className="flex items-start space-x-3">
+                      {getNotificationIcon(notification.type)}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <p className={`text-sm font-medium ${
+                            !notification.is_read ? 'text-secondary-900' : 'text-secondary-700'
+                          }`}>
+                            {notification.title}
+                          </p>
+                          <span className="text-xs text-secondary-500 ml-2 flex-shrink-0">
+                            {formatTimeAgo(notification.created_at)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-secondary-600 mt-1 line-clamp-2">
+                          {notification.message}
                         </p>
-                        <span className="text-xs text-secondary-500 ml-2 flex-shrink-0">
-                          {formatTimeAgo(notification.created_at)}
-                        </span>
+                        {!notification.is_read && (
+                          <div className="w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
+                        )}
                       </div>
-                      <p className="text-sm text-secondary-600 mt-1 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      {!notification.is_read && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      )}
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="px-4 py-8 text-center">
+                  <div className="text-4xl mb-2">🔔</div>
+                  <p className="text-secondary-500 text-sm">No notifications yet</p>
                 </div>
-              ))
-            ) : (
-              <div className="px-4 py-8 text-center">
-                <div className="text-4xl mb-2">🔔</div>
-                <p className="text-secondary-500 text-sm">No notifications yet</p>
+              )}
+            </div>
+            {/* Footer */}
+            {notifications.length > 0 && (
+              <div className="px-4 py-2 border-t border-secondary-200 bg-secondary-50 text-xs text-secondary-500 text-center sticky bottom-0">
+                {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
               </div>
             )}
           </div>
-
-          {/* Footer */}
-          {notifications.length > 0 && (
-            <div className="px-4 py-2 border-t border-secondary-200 bg-secondary-50">
-              <p className="text-xs text-secondary-500 text-center">
-                {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
-              </p>
-            </div>
-          )}
         </div>
       )}
     </div>
