@@ -182,7 +182,7 @@ function InstructorProfilePage() {
             </div>
           ))}
         </div>
-        <button onClick={handleAvailabilitySubmit} className="mt-6 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+        <button onClick={handleAvailabilitySubmit} className="mt-6 bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
           Save Availability
         </button>
       </div>

@@ -43,8 +43,10 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(prev => [notification, ...prev]);
       setUnreadCount(prev => prev + 1);
       
-      // Play notification sound
+      // Play notification sound (trigger both ways)
       playNotificationSound();
+      // Also trigger a custom event for mobile/hidden audio
+      window.dispatchEvent(new Event('drivigo-notification-sound'));
       
       // Show browser notification if permission granted
       if (Notification.permission === 'granted') {
