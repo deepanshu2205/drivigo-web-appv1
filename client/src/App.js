@@ -242,6 +242,24 @@ function App() {
                       </Link>
                     </>
                   )}
+                  {/* Theme Toggle Button for mobile */}
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full mt-2 p-2 rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
+                    aria-label="Toggle dark mode"
+                    title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                  >
+                    {theme === 'dark' ? (
+                      <svg className="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
+                      </svg>
+                    )}
+                    <span className="ml-2 align-middle">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                  </button>
                 </div>
               </div>
             )}

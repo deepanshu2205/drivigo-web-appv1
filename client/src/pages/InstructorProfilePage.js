@@ -133,32 +133,32 @@ function InstructorProfilePage() {
           
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Full Name:</label>
-            <input type="text" name="name" value={formData.name} onChange={handleProfileChange} placeholder="e.g., John Doe" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <input type="text" name="name" value={formData.name} onChange={handleProfileChange} placeholder="e.g., John Doe" className="input-field"/>
           </div>
           
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Phone Number:</label>
-            <input type="text" name="phone_number" value={formData.phone_number} onChange={handleProfileChange} placeholder="e.g., 919876543210" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <input type="text" name="phone_number" value={formData.phone_number} onChange={handleProfileChange} placeholder="e.g., 919876543210" className="input-field"/>
           </div>
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Car Model:</label>
-            <input type="text" name="car_model" value={formData.car_model} onChange={handleProfileChange} placeholder="e.g., Maruti Swift" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <input type="text" name="car_model" value={formData.car_model} onChange={handleProfileChange} placeholder="e.g., Maruti Swift" className="input-field"/>
           </div>
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Service Area Address:</label>
-            <input type="text" name="service_address" value={formData.service_address} onChange={handleProfileChange} placeholder="e.g., Saket, New Delhi" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <input type="text" name="service_address" value={formData.service_address} onChange={handleProfileChange} placeholder="e.g., Saket, New Delhi" className="input-field"/>
             <p className="text-xs text-gray-500 mt-1">Enter an address to set the center of your service area.</p>
           </div>
 
           <div>
             <label className="block text-gray-700 text-sm font-bold mb-2">Photo URL:</label>
-            <input type="text" name="photo_url" value={formData.photo_url} onChange={handleProfileChange} placeholder="http://example.com/photo.jpg" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"/>
+            <input type="text" name="photo_url" value={formData.photo_url} onChange={handleProfileChange} placeholder="http://example.com/photo.jpg" className="input-field"/>
              <p className="text-xs text-gray-500 mt-1">For now, please paste a link to your photo.</p>
           </div>
 
-          <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Save Profile</button>
+          <button type="submit" className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-4 w-full sm:w-auto">Save Profile</button>
         </form>
       </div>
 
