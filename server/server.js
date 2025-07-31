@@ -383,6 +383,40 @@ app.get('/api/instructor/bookings', authMiddleware, async (req, res) => {
   }
 });
 
+// GET LEARNER PROFILE
+app.get('/api/learner/profile', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const result = await pool.query(
+      'SELECT name, email, phone_number, gender, age FROM users WHERE id = $1 AND role = $2',
+      [userId, 'learner']
+    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Learner profile not found.' });
+    }
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error('Error fetching learner profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// UPDATE LEARNER PROFILE
+app.put('/api/learner/profile', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { name, phone_number, gender, age } = req.body;
+    await pool.query(
+      'UPDATE users SET name = $1, phone_number = $2, gender = $3, age = $4 WHERE id = $5 AND role = $6',
+      [name, phone_number, gender, age, userId, 'learner']
+    );
+    res.json({ message: 'Profile updated successfully!' });
+  } catch (error) {
+    console.error('Error updating learner profile:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // GET LEARNER BOOKINGS
 app.get('/api/learner/bookings', authMiddleware, async (req, res) => {
   try {

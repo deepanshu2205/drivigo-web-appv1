@@ -14,6 +14,7 @@ import ContactPage from './pages/ContactPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
 import { NotificationProvider } from './components/NotificationContext';
+import LearnerProfilePage from './pages/LearnerProfilePage';
 
 function App() {
   // We need to wrap the logic in a component to use the useNavigate hook
@@ -140,6 +141,17 @@ function App() {
                     </svg>
                   )}
                 </button>
+                {/* Profile Icon Button */}
+                <Link
+                  to="/learner-profile"
+                  className="ml-2 p-2 rounded-full border border-secondary-200 dark:border-secondary-600 bg-secondary-50 dark:bg-secondary-700 text-secondary-700 dark:text-secondary-200 hover:bg-secondary-100 dark:hover:bg-secondary-600 transition-colors"
+                  aria-label="Profile"
+                  title="My Profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </Link>
               </div>
 
               {/* Mobile menu button */}
@@ -278,6 +290,7 @@ function App() {
               <Route path="/booking/:bookingId" element={<ProtectedRoute><BookingDetailsPage /></ProtectedRoute>} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/learner-profile" element={<LearnerProfilePage />} />
               <Route path="/" element={<HomePage />} />
             </Routes>
           </div>
