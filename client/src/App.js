@@ -13,7 +13,10 @@ import AboutPage from './pages/AboutPage';
 import ContactPage from './pages/ContactPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
+import LearnerProfile from './pages/LearnerProfile';
 import { NotificationProvider } from './components/NotificationContext';
+
+
 
 function App() {
   // We need to wrap the logic in a component to use the useNavigate hook
@@ -141,6 +144,11 @@ function App() {
                   )}
                 </button>
               </div>
+            {/* LearnerProfile */}
+             <Link to="/profile" title="Go to Profile">
+             <span className="text-2xl cursor-pointer hover:text-blue-500">👤</span>
+             </Link>
+
 
               {/* Mobile menu button */}
               <div className="md:hidden">
@@ -279,6 +287,7 @@ function App() {
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/" element={<HomePage />} />
+              <Route path="/profile" element={<LearnerProfile />} />
             </Routes>
           </div>
         </main>
