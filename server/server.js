@@ -20,7 +20,7 @@ const io = socketIo(server, {
     origin: [
       'http://localhost:3000',
       'https://drivigo-web-appv1.vercel.app',
-      'https://drivigo-web-appv1-git-fork-ak5113-a4491d-deepanshu-drivigo-team.vercel.app'
+      'https://drivigo-web-appv1-git-fork-ak5113-a4491d-deepanshu-drivigo-team.vercel.app/'
     ],
     methods: ["GET", "POST"]
   }
