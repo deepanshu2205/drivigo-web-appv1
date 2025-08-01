@@ -26,13 +26,6 @@ function HomePage() {
     }
   ];
 
-  const stats = [
-    { number: "500+", label: "Happy Learners" },
-    { number: "50+", label: "Expert Instructors" },
-    { number: "1000+", label: "Lessons Completed" },
-    { number: "4.8", label: "Average Rating" }
-  ];
-
   return (
     <div className="animate-fade-in">
       {/* Hero Section */}
@@ -42,11 +35,11 @@ function HomePage() {
             {/* Left Content */}
             <div className="text-center lg:text-left">
               <h1 className="text-4xl lg:text-6xl font-display font-bold text-secondary-900 mb-6 leading-tight">
-                Drivigo se 
-                <span className="text-gradient block"> Seekho!</span>
+                Gaadi Seekhni h?
+                <span className="text-gradient block"> Drivigo se Seekho!</span>
               </h1>
               <p className="text-xl text-secondary-600 mb-8 leading-relaxed">
-                Gaadi seekhni h? Hum sikha denge! Verified instructors se seekho aur securely pay kro ❤️
+                Verified instructors se seekho aur securely pay kro ❤️
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link 
@@ -78,24 +71,6 @@ function HomePage() {
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-primary-200 rounded-full opacity-50"></div>
               <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-secondary-200 rounded-full opacity-50"></div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl lg:text-4xl font-display font-bold text-primary-600 mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-secondary-600 font-medium">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
